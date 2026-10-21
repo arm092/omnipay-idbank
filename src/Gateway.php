@@ -6,10 +6,13 @@ namespace Omnipay\IDBank;
 
 use Omnipay\Common\AbstractGateway;
 use Omnipay\IDBank\Message\Request;
+use Omnipay\IDBank\Api\Operations;
+use Omnipay\IDBank\Message\ApiRequest;
 
 class Gateway extends AbstractGateway
 {
     use Parameters;
+    use Api\GatewayMethods;
 
     public function getName(): string
     {
@@ -26,6 +29,8 @@ class Gateway extends AbstractGateway
             'testMode' => false,
             'liveEndpoint' => 'https://ipayproxy.idp.am/payment/rest/',
             'testEndpoint' => '',
+            'liveEpgEndpoint' => '',
+            'testEpgEndpoint' => '',
         ];
     }
 
@@ -72,5 +77,17 @@ class Gateway extends AbstractGateway
     private function operation(string $operation, array $parameters): Request
     {
         return $this->createRequest(Request::class, array_merge($parameters, ['operation' => $operation]));
+    }
+
+    /** Execute a documented, named EPG operation. */
+    public function api(string $operation, array $parameters = []): ApiRequest
+    {
+        Operations::get($operation);
+        return $this->createRequest(ApiRequest::class, array_merge($parameters, ['operation' => $operation]));
+    }
+
+    public function getSupportedApiOperations(): array
+    {
+        return array_keys(Operations::all());
     }
 }

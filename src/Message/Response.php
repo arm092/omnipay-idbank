@@ -136,6 +136,23 @@ class Response extends AbstractResponse implements RedirectResponseInterface
         return $this->isRedirect() ? $this->data['formUrl'] : null;
     }
 
+    public function getCardReference(): ?string
+    {
+        $reference = $this->data['bindingInfo']['bindingId'] ?? $this->data['bindingId'] ?? null;
+        return is_scalar($reference) ? (string) $reference : null;
+    }
+
+    public function getRecurrenceId(): ?string
+    {
+        $id = $this->data['recurrenceId'] ?? null;
+        return is_scalar($id) ? (string) $id : null;
+    }
+
+    public function getTransactionData(): ?string
+    {
+        return is_string($this->data['transactionData'] ?? null) ? $this->data['transactionData'] : null;
+    }
+
     private function hasError(): bool
     {
         return isset($this->data['errorCode']) && (string) $this->data['errorCode'] !== '0';

@@ -25,6 +25,20 @@ class Request extends AbstractRequest
         'void' => 'reverse.do',
     ];
 
+    /** Additional wire parameters, preserving the bank's field names and units. */
+    public function setParameters(array $parameters): static
+    {
+        if (array_intersect(['userName', 'password'], array_keys($parameters))) {
+            throw new InvalidRequestException('Configure credentials on the gateway, not in parameters.');
+        }
+        return $this->setParameter('apiParameters', $parameters);
+    }
+
+    public function getApiParameters(): array
+    {
+        return $this->getParameter('apiParameters') ?? [];
+    }
+
     public function getOperation(): string
     {
         return (string) $this->getParameter('operation');
@@ -117,6 +131,14 @@ class Request extends AbstractRequest
                 $this->getMinorAmount();
                 $this->getNumericCurrency();
             }
+        }
+        foreach ($this->getApiParameters() as $name => $value) {
+            if (array_key_exists($name, $data)) {
+                throw new InvalidRequestException('Additional parameters cannot override standard payment fields.');
+            }
+            $data[$name] = is_array($value)
+                ? json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)
+                : (is_bool($value) ? ($value ? 'true' : 'false') : $value);
         }
         return $data;
     }

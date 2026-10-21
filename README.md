@@ -9,7 +9,7 @@ Framework independent. Requires PHP 8.2 or newer.
 ## Installation
 
 ```bash
-composer require arm092/omnipay-idbank:^1.0 php-http/guzzle7-adapter:^1.1
+composer require arm092/omnipay-idbank:^1.1 php-http/guzzle7-adapter:^1.1
 ```
 
 The Guzzle adapter supplies the HTTP client used by Omnipay. An existing compatible
@@ -201,8 +201,116 @@ information; avoid logging it indiscriminately.
 `purchase`, `completePurchase`, `authorize`, `completeAuthorize`, `capture`,
 `refund`, `void` and `fetchTransaction`.
 
-Bindings, recurring payments, direct card processing, P2P and wallet-specific
-integrations are outside this driver's current scope.
+Version 1.1 adds **41 named EPG operations**, covering the API families in the
+Merchant Integration Guide:
+
+| Capability | Methods and reference |
+| --- | --- |
+| Direct card payment and 3DS | `paymentOrder`, eligibility checks, `finish3dsPayment`; [card API](docs/cards-and-reports.md) |
+| Binding creation, payments, expiry and activation | 14 operations; [bindings](docs/bindings-recurring.md) |
+| Recurring payments and templates | 7 operations; [recurring API](docs/bindings-recurring.md#recurring-operations) |
+| Basic/extended status, refund status and reports | [reporting API](docs/cards-and-reports.md) |
+| Fee calculation | `calculateFee`, `calculateFeePublic`; [fee API](docs/cards-and-reports.md) |
+| P2P registration, transfer, verification and status | 10 operations; [P2P API](docs/p2p.md) |
+
+`createCard`, `updateCard` and `deleteCard` are Omnipay aliases for
+`createBindingNoPayment`, `extendBinding` and `unBindCard`. Deleting a card
+deactivates its binding. `cardReference` maps to `bindingId`.
+
+List all named operations with `$gateway->getSupportedApiOperations()`. Each is
+available as `$gateway->operationName($options)` or
+`$gateway->api('operationName', $options)`; the latter accepts only documented
+operation names, not arbitrary paths. Google Pay's separate API is not included.
+
+### Extended endpoint configuration
+
+The bank's REST endpoint and its EPG root are separate settings. Operations whose
+manual examples use `/epg/` require an explicit root confirmed by the bank:
+
+```php
+$gateway->setLiveEpgEndpoint('https://bank.example/epg/');
+$gateway->setTestEpgEndpoint('https://sandbox.example/epg/');
+```
+
+These are example addresses. The driver does not infer an EPG root from the
+IDBank REST address. Existing v1.0 operations keep their REST endpoint settings.
+
+For deployment-specific routes, configure full HTTPS URLs by environment:
+
+```php
+$gateway->setEndpointOverrides([
+    'live' => [
+        'finish3dsPayment' => $bankConfirmedFinishUrl,
+        'createRecurringTemplateNoPayment' => $bankConfirmedTemplateUrl,
+    ],
+    'test' => [
+        'finish3dsPayment' => $bankConfirmedTestFinishUrl,
+    ],
+]);
+```
+
+These two methods have no default route: the guide names them without defining a
+complete endpoint and request/response contract. Supply the bank-confirmed URL
+and its required callback/template fields. A test request never uses a live
+override. Overrides apply to the 41 extended operations; existing payment
+operations use `liveEndpoint` and `testEndpoint`.
+
+### Additional API parameters
+
+Use the `parameters` array for optional registration fields and the extended
+API's original wire fields. Preserve their case and API units:
+
+```php
+$response = $gateway->purchase([
+    'transactionId' => 'ORDER-43',
+    'amount' => '1500.00',
+    'currency' => 'AMD',
+    'returnUrl' => 'https://shop.example/payments/idbank/return',
+    'parameters' => ['clientId' => 'customer-42', 'bindingId' => $bindingId],
+])->send();
+
+$payment = $gateway->paymentOrderBinding([
+    'transactionReference' => $storedGatewayReference,
+    'cardReference' => $bindingId,
+    'parameters' => ['cvc' => $customerSuppliedCvc],
+])->send();
+```
+
+Top-level Omnipay `amount` remains a major-unit decimal string. Raw
+`parameters.amount` and `parameters.amountInput` are integer minor units. Nested
+P2P card and fee fields retain the bank's wire structure. Conflicting normalized
+and wire fields are rejected. Configure credentials on the gateway; they cannot
+be overridden through the bag. Objects/arrays used as form parameters are JSON
+encoded; report merchant/state arrays are comma separated. JSON API requests
+preserve nested structures and booleans. Follow each method's documented field
+types when a nested JSON string is required.
+
+`getCardReference()`, `getRecurrenceId()` and `getTransactionData()` expose binding,
+recurring-series and opaque signed CoF data when present. Keep `transactionData`
+unchanged when forwarding it to merchant-managed recurring/CoF requests.
+
+### Direct card and authentication flows
+
+`paymentOrder` accepts an Omnipay `card` or the raw card fields described in the
+card API reference. Handling raw cards requires the merchant's applicable PCI
+DSS setup and bank permissions; hosted checkout does not require the driver to
+receive card data.
+
+For an ACS challenge, use the response's redirect helpers: they produce POST
+fields for 3DS1 (`PaReq`, `MD`, `TermUrl`) or 3DS2 (`creq`). Preserve the bank's
+opaque authentication messages. An accepted request or challenge does not prove
+payment: confirm final status with the existing completion methods using your
+stored expected order, amount and currency.
+
+Fee responses distinguish `SUCCESS`, `ERROR` and `UNAVAILABLE`. Boolean amount
+checks preserve false results. P2P perform requests can return an accepted
+operation without final transfer status; query status before treating the
+transfer as complete. For information/reporting methods, `isSuccessful()` means
+the API request succeeded; inspect the payload's business result separately.
+
+Two P2P methods require credentials in the URL query according to the guide.
+Avoid logging their complete outgoing URLs. Never log card data or authentication
+messages, and do not retry money-moving requests automatically.
 
 ## Development
 
