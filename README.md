@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/arm092/omnipay-idbank/actions/workflows/tests.yml/badge.svg)](https://github.com/arm092/omnipay-idbank/actions/workflows/tests.yml)
 [![Packagist](https://img.shields.io/packagist/v/arm092/omnipay-idbank.svg)](https://packagist.org/packages/arm092/omnipay-idbank)
+[![Total Downloads](https://img.shields.io/packagist/dt/arm092/omnipay-idbank.svg)](https://packagist.org/packages/arm092/omnipay-idbank/stats)
 
 IDBank EPG payment gateway driver for [Omnipay](https://omnipay.thephpleague.com/).
 Framework independent. Requires PHP 8.2 or newer.
