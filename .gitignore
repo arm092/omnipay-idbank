@@ -1,0 +1,12 @@
+/vendor/
+/composer.lock
+/.local/
+/.phpunit.cache/
+/.phpunit.result.cache
+/build/
+/.env
+/.env.*
+/.idea/
+/.vscode/
+/AGENTS.md
+/.superpowers/
