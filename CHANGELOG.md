@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Require Guzzle 7 directly so installation needs only the gateway package.
+- Clarify Laravel and standalone installation instructions.
+- Map supported capabilities to sections 4.1 through 4.17 of the EPG guide.
+- Format Composer metadata consistently and retain Apricode Team authorship.
+
 ## 1.1.0
 
 - Add 41 named EPG operations for direct cards, 3DS eligibility and completion,
