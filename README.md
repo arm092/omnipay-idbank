@@ -14,19 +14,19 @@ Framework independent. Requires PHP 8.2 or newer.
 composer require arm092/omnipay-idbank:^1.1
 ```
 
-Laravel projects with Guzzle 7 already installed can use that client through
-Omnipay's automatic HTTP client discovery. No explicit Guzzle adapter dependency
+Guzzle 7 is a required dependency of this package. Composer installs it
+automatically or reuses the compatible version already installed by Laravel.
+Omnipay discovers the HTTP client automatically; no explicit adapter dependency
 is needed in the installation command.
 
 ### Other PHP projects
 
 ```bash
-composer require arm092/omnipay-idbank:^1.1 php-http/guzzle7-adapter:^1.1
+composer require arm092/omnipay-idbank:^1.1
 ```
 
-The adapter is one way to provide a compatible HTTP client. If Guzzle 7 or another
-supported client is already available, install only `arm092/omnipay-idbank`.
-This package depends on `omnipay/common` and does not include or replace its classes.
+The same command installs the required Guzzle 7 client. This package depends on
+`omnipay/common` and does not include or replace its classes.
 
 ## Configuration
 

@@ -4,7 +4,14 @@
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/arm092/omnipay-idbank",
-    "keywords": ["omnipay", "idbank", "arca", "epg", "payment", "armenia"],
+    "keywords": [
+        "omnipay",
+        "idbank",
+        "arca",
+        "epg",
+        "payment",
+        "armenia"
+    ],
     "authors": [
         {
             "name": "Apricode Team",
@@ -15,11 +22,35 @@
         "issues": "https://github.com/arm092/omnipay-idbank/issues",
         "source": "https://github.com/arm092/omnipay-idbank"
     },
-    "require": {"php": "^8.2", "ext-json": "*", "omnipay/common": "^3.5", "moneyphp/money": "^4.0.3"},
-    "require-dev": {"phpunit/phpunit": "^11.5", "php-http/guzzle7-adapter": "^1.1"},
-    "autoload": {"psr-4": {"Omnipay\\IDBank\\": "src/"}},
-    "autoload-dev": {"psr-4": {"Omnipay\\IDBank\\Tests\\": "tests/"}},
-    "scripts": {"test": "phpunit", "lint": "@php tests/lint.php"},
-    "config": {"allow-plugins": {"php-http/discovery": true}},
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.0",
+        "moneyphp/money": "^4.0.3",
+        "omnipay/common": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "php-http/guzzle7-adapter": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Omnipay\\IDBank\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Omnipay\\IDBank\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "@php tests/lint.php"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
     "prefer-stable": true
 }
