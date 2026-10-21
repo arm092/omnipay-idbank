@@ -5,7 +5,12 @@
     "license": "MIT",
     "homepage": "https://github.com/arm092/omnipay-idbank",
     "keywords": ["omnipay", "idbank", "arca", "epg", "payment", "armenia"],
-    "authors": [{"name": "Apricode Team", "email": "arman.khachatryan@apricode.am"}],
+    "authors": [
+        {
+            "name": "Apricode Team",
+            "email": "arman.khachatryan@apricode.am"
+        }
+    ],
     "support": {
         "issues": "https://github.com/arm092/omnipay-idbank/issues",
         "source": "https://github.com/arm092/omnipay-idbank"
