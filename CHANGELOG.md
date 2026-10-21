@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+- Support Guzzle 7 and 8 without requiring consumers to downgrade their HTTP stack.
+- Remove the development-only Guzzle 7 adapter and check both major versions in CI.
+- Disable Composer discovery's dependency auto-installation for package development;
+  runtime PSR-18 and PSR-17 discovery remains available without the plugin.
+
 ## 1.1.1
 
 - Require Guzzle 7 directly so installation needs only the gateway package.
