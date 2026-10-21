@@ -213,17 +213,37 @@ information; avoid logging it indiscriminately.
 `purchase`, `completePurchase`, `authorize`, `completeAuthorize`, `capture`,
 `refund`, `void` and `fetchTransaction`.
 
-Version 1.1 adds **41 named EPG operations**, covering the API families in the
-Merchant Integration Guide:
+### API coverage
 
-| Capability | Methods and reference |
-| --- | --- |
-| Direct card payment and 3DS | `paymentOrder`, eligibility checks, `finish3dsPayment`; [card API](docs/cards-and-reports.md) |
-| Binding creation, payments, expiry and activation | 14 operations; [bindings](docs/bindings-recurring.md) |
-| Recurring payments and templates | 7 operations; [recurring API](docs/bindings-recurring.md#recurring-operations) |
-| Basic/extended status, refund status and reports | [reporting API](docs/cards-and-reports.md) |
-| Fee calculation | `calculateFee`, `calculateFeePublic`; [fee API](docs/cards-and-reports.md) |
-| P2P registration, transfer, verification and status | 10 operations; [P2P API](docs/p2p.md) |
+The driver implements request and response handling for the **SmartVista EPG Web
+API used by ArCa/IDBank**, following the **EPG Merchant Integration Guide**
+(`EPG Merchant Manual.pdf`). Version 1.1 provides the standard Omnipay payment
+methods above plus **41 named EPG operations**. The table maps the supported
+capabilities to the guide's sections.
+
+| Guide section | Supported capability | Methods and reference |
+| --- | --- | --- |
+| 4.1 | One-stage and two-stage order registration | `purchase`, `authorize` |
+| 4.2 | Capture of an authorized amount, including partial capture | `capture` |
+| 4.3 – 4.5 | Direct card payment, 3DS1/3DS2 challenges and eligibility checks | `paymentOrder`, `check3ds2Eligibility`, `check3ds2EligibilityPreliminary`, `finish3dsPayment`; [card API](docs/cards-and-reports.md) |
+| 4.6 | Manual recurring charges, recurring settings, details, reports and templates | 7 operations; [recurring API](docs/bindings-recurring.md#recurring-operations) |
+| 4.7 | Payment reversal | `void` |
+| 4.8 | Refunds, including partial refunds | `refund` |
+| 4.9 – 4.12 | Basic/extended order status, refund status and paginated transaction reports | `getOrderStatus`, `getOrderStatusExtended`, `getRefundStatus`, `getLastOrdersForMerchants`; [reporting API](docs/cards-and-reports.md) |
+| 4.13 | Fee calculation, including the public authenticated variant | `calculateFee`, `calculateFeePublic`; [fee API](docs/cards-and-reports.md) |
+| 4.14 – 4.15 | Binding creation, saved-card payments, expiry updates, activation, deactivation, lookup and amount checks | 14 operations; [bindings](docs/bindings-recurring.md) |
+| 4.16 | Merchant-managed Card-on-File, CIT/MIT, recurring/installment and no-show parameters | Parameter forwarding and opaque signed transaction data; [CoF fields](docs/bindings-recurring.md#merchant-managed-cof-and-recurring-data) |
+| 4.17 | P2P registration, transfer, verification, alias resolution, fees and status | 10 operations; [P2P API](docs/p2p.md) |
+
+Automatic recurring schedules are configured through EPG; the driver does not run
+a local scheduler. Merchant-managed CoF forwards the bank's signed transaction
+data unchanged rather than generating or signing it locally. Availability of each
+operation depends on the bank and the permissions enabled for the merchant.
+
+Extended EPG routes require the endpoint configuration below. In particular,
+`finish3dsPayment` and `createRecurringTemplateNoPayment` require explicit
+bank-confirmed URLs and parameters because the guide does not fully specify
+their contracts.
 
 `createCard`, `updateCard` and `deleteCard` are Omnipay aliases for
 `createBindingNoPayment`, `extendBinding` and `unBindCard`. Deleting a card
